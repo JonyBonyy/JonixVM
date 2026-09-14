@@ -7,7 +7,8 @@
         x:Class="Client.Views.MainWindow"
         x:DataType="vm:MainViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Client">
+        Title="JonixVM"
+        MinHeight="400" MinWidth="750">
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
@@ -15,8 +16,59 @@
         <vm:MainViewModel />
     </Design.DataContext>
 
-    <TextBox Text="{Binding Greeting}"
-             HorizontalAlignment="Center"
-             VerticalAlignment="Center" />
+    
+    <StackPanel HorizontalAlignment="Center" Margin="0,100,0,0" Spacing="50">
+        
+        <TextBlock Text="JonixVM"
+                   Height="55" Width="200"
+                   FontSize="50"
+                   FontWeight="SemiLight"
+                   Foreground="#1a1a2e"
+                   TextAlignment="Center">
+            <TextBlock.Background>
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                    <GradientStop Offset="0" Color="#ffffff" />
+                    <GradientStop Offset="1" Color="#d1d1e0" />
+                </LinearGradientBrush>
+            </TextBlock.Background>
+        </TextBlock>
+
+        <!-- Button container -->
+        <StackPanel Spacing="15" HorizontalAlignment="Center">
+            
+            <Button Content="Log In"
+                    Width="200" Height="45"
+                    Background="#1a1a2e"
+                    Foreground="White"
+                    FontSize="16"
+                    FontWeight="SemiBold"
+                    CornerRadius="8"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"/>
+            
+            <Button Content="Register" 
+                    Width="200" Height="45"
+                    Background="#1a1a2e"
+                    Foreground="White"
+                    FontSize="16"
+                    FontWeight="SemiBold"
+                    CornerRadius="8"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"/>
+
+            <Button Content="Continue without"
+                    Width="200" Height="45"
+                    Background="Transparent"
+                    Foreground="#1a1a2e"
+                    FontSize="14"
+                    FontWeight="Medium"
+                    CornerRadius="8"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"/>
+                    
+        </StackPanel>
+    </StackPanel>
+    
+    
 
 </Window>
