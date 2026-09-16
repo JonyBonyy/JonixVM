@@ -5,6 +5,9 @@
       <map>
         <entry key="Client/Views/LoginView.axaml" value="Client/Client.csproj" />
         <entry key="Client/Views/MainWindow.axaml" value="Client/Client.csproj" />
+        <entry key="Client/Views/RegisterView.axaml" value="Client/Client.csproj" />
+        <entry key="Client/Views/SigninView.axaml" value="Client/Client.csproj" />
+        <entry key="Server/Views/MainWindow.axaml" value="Server/Server.csproj" />
       </map>
     </option>
   </component>

@@ -37,6 +37,7 @@
         <StackPanel Spacing="15" HorizontalAlignment="Center">
             
             <Button Content="Log In"
+                    Click="NavigateToLogin_Click"
                     Width="200" Height="45"
                     Background="#1a1a2e"
                     Foreground="White"
@@ -46,7 +47,8 @@
                     HorizontalContentAlignment="Center"
                     VerticalContentAlignment="Center"/>
             
-            <Button Content="Register" 
+            <Button Content="Sign in" 
+                    Click="NavigateToSignin_Click"
                     Width="200" Height="45"
                     Background="#1a1a2e"
                     Foreground="White"
