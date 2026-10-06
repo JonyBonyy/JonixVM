@@ -17,8 +17,8 @@ public partial class MainWindow : Window
         this.Content = new LoginView();
     }
 
-    private void NavigateToSignin_Click(object? sender, RoutedEventArgs e)
+    private void NavigateToSignup_Click(object? sender, RoutedEventArgs e)
     {
-        this.Content = new SigninView();
+        this.Content = new SignupView();
     }
 }

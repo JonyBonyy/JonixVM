@@ -3,20 +3,25 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="300"
-             x:Class="Client.Views.SigninView">
+             x:Class="Client.Views.SignupView">
     <StackPanel Margin="0 0,0,250" Spacing="10" VerticalAlignment="Center">
-        <TextBlock Text="Sign in"
+        <TextBlock Text="Sign up"
                    FontSize="50"
                    Margin="20"
                    HorizontalAlignment="Center"/>
-        <TextBox Watermark="Username"
+        <TextBox x:Name="Username"
+                 Watermark="Username"
                  Width="300"/>
-        <TextBox Watermark="Password"
+        <TextBox x:Name="Password"
+                 Watermark="Password"
                  Width="300"
                  PasswordChar="*"/>
-        <TextBox Watermark="Confirm Password"
+        <TextBox x:Name="ConfirmPassword"
+                 Watermark="Confirm Password"
                  Width="300"
                  PasswordChar="*"/>
-        <Button Content="Log in" HorizontalAlignment="Center"/>
+        <Button Content="Continue"
+                Click="SubmitSignin_Click"
+                HorizontalAlignment="Center"/>
     </StackPanel>
 </UserControl>

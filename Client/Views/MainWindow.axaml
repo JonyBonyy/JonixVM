@@ -47,8 +47,8 @@
                     HorizontalContentAlignment="Center"
                     VerticalContentAlignment="Center"/>
             
-            <Button Content="Sign in" 
-                    Click="NavigateToSignin_Click"
+            <Button Content="Sign up" 
+                    Click="NavigateToSignup_Click"
                     Width="200" Height="45"
                     Background="#1a1a2e"
                     Foreground="White"

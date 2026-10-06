@@ -9,11 +9,15 @@
                    FontSize="50"
                    Margin="20"
                    HorizontalAlignment="Center"/>
-        <TextBox Watermark="Username"
+        <TextBox x:Name="Username"
+                 Watermark="Username"
                  Width="300"/>
-        <TextBox Watermark="Password"
+        <TextBox x:Name="Password"
+                 Watermark="Password"
                  Width="300"
                  PasswordChar="*"/>
-        <Button Content="Log in" HorizontalAlignment="Center"/>
+        <Button Content="Continue"
+                Click="SubmitLogin_Click"
+                HorizontalAlignment="Center"/>
     </StackPanel>
 </UserControl>
