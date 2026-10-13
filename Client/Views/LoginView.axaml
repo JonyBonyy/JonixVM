@@ -15,7 +15,8 @@
         <TextBox x:Name="Password"
                  Watermark="Password"
                  Width="300"
-                 PasswordChar="*"/>
+                 PasswordChar="*"
+                 Classes="revealPasswordButton"/>
         <Button Content="Continue"
                 Click="SubmitLogin_Click"
                 HorizontalAlignment="Center"/>

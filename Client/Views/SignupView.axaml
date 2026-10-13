@@ -15,11 +15,13 @@
         <TextBox x:Name="Password"
                  Watermark="Password"
                  Width="300"
-                 PasswordChar="*"/>
+                 PasswordChar="*"
+                 Classes="revealPasswordButton"/>
         <TextBox x:Name="ConfirmPassword"
                  Watermark="Confirm Password"
                  Width="300"
-                 PasswordChar="*"/>
+                 PasswordChar="*"
+                 Classes="revealPasswordButton"/>
         <Button Content="Continue"
                 Click="SubmitSignin_Click"
                 HorizontalAlignment="Center"/>
