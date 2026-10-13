@@ -6,7 +6,7 @@ namespace Server.Managers;
 
 public class DatabaseManager
 {
-    // Update YOUR_PASSWORD to match your actual PostgreSQL setup
+    // Update the password to match the actual PostgreSQL setup
     private readonly string _connectionString = "Host=127.0.0.1;Username=postgres;Password=YOUR_PASSWORD;Database=jonixvm";
 
     // A simple method to verify the server can talk to the database

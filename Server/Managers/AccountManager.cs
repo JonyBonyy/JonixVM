@@ -13,6 +13,9 @@ public class AccountManager
         
         try
         {
+            // Create the hash from the plain text password
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
+            
             await using var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
 
@@ -22,7 +25,7 @@ public class AccountManager
             
             await using var cmd = new NpgsqlCommand(query, conn);
             cmd.Parameters.AddWithValue("username", username);
-            cmd.Parameters.AddWithValue("password", password);
+            cmd.Parameters.AddWithValue("password", hashedPassword);
 
             await cmd.ExecuteNonQueryAsync();
             return true;
@@ -43,18 +46,26 @@ public class AccountManager
             await using var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
 
-            // Count how many rows match both the username and the password
-            string query = "SELECT COUNT(*) FROM users WHERE username = @username AND password_hash = @password";
-            
+            // Fetch only the password hash for this username
+            string query = "SELECT password_hash FROM users WHERE username = @username";
             await using var cmd = new NpgsqlCommand(query, conn);
             cmd.Parameters.AddWithValue("username", username);
-            cmd.Parameters.AddWithValue("password", password);
 
-            // ExecuteScalar returns the first column of the first row (the count)
-            long count = (long)await cmd.ExecuteScalarAsync();
+            // Read the result
+            await using var reader = await cmd.ExecuteReaderAsync();
             
-            // If count is greater than 0, the user exists and the password is correct
-            return count > 0;
+            // If we found the user in the database
+            if (await reader.ReadAsync())
+            {
+                string storedHash = reader.GetString(0);
+                
+                // Compare the plain text password from the user with the stored hash
+                bool isPasswordCorrect = BCrypt.Net.BCrypt.Verify(password, storedHash);
+                return isPasswordCorrect;
+            }
+            
+            // User not found
+            return false;
         }
         catch (Exception ex)
         {

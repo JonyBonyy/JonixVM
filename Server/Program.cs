@@ -11,7 +11,7 @@ class Program
 {
     static async Task Main(string[] args)
     {
-        Console.WriteLine("Starting JonixVM Server...");
+        Console.WriteLine("Starting Server");
 
         // 1. Initialize and test the database connection
         DatabaseManager dbManager = new DatabaseManager();

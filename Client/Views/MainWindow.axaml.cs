@@ -10,13 +10,13 @@ public partial class MainWindow : Window
         InitializeComponent();
     }
 
-    // Add this new method
+    //Switches to Log in screen
     private void NavigateToLogin_Click(object? sender, RoutedEventArgs e)
     {
-        // This replaces the entire Welcome screen with your LoginView
         this.Content = new LoginView();
     }
 
+    //Switches to Sign in screen
     private void NavigateToSignup_Click(object? sender, RoutedEventArgs e)
     {
         this.Content = new SignupView();
