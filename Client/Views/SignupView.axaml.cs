@@ -13,6 +13,16 @@ public partial class SignupView : UserControl
     {
         InitializeComponent();
     }
+    
+    private void BackButton_Click(object? sender, RoutedEventArgs e)
+    {
+        var window = TopLevel.GetTopLevel(this) as Window;
+        if (window != null)
+        {
+            // Instantly swap the view back to the saved start screen
+            window.Content = MainWindow.StartScreenContent;
+        }
+    }
 
     private async void SubmitSignin_Click(object? sender, RoutedEventArgs e)
     {

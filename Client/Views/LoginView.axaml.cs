@@ -14,9 +14,14 @@ public partial class LoginView : UserControl
         InitializeComponent();
     }
     
-    private void NavigateToHomePage_Click(object? sender, RoutedEventArgs e)
+    private void BackButton_Click(object? sender, RoutedEventArgs e)
     {
-        this.Content = new HomePageView();
+        var window = TopLevel.GetTopLevel(this) as Window;
+        if (window != null)
+        {
+            // Instantly swap the view back to the saved start screen
+            window.Content = MainWindow.StartScreenContent;
+        }
     }
 
     private async void SubmitLogin_Click(object? sender, RoutedEventArgs e)
