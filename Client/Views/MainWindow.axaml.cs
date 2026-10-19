@@ -1,5 +1,5 @@
 using Avalonia.Controls;
-using Avalonia.Interactivity; // Make sure this is added at the top
+using Avalonia.Interactivity;
 
 namespace Client.Views;
 

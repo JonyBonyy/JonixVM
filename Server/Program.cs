@@ -63,12 +63,12 @@ class Program
                         if (isValid)
                         {
                             Console.WriteLine($"Login Success! User '{username}' is now connected.");
-                            // Later: Send a success byte back to the client
+                            await stream.WriteAsync(new byte[] { 1 }, 0, 1); // Send Success (1)
                         }
                         else
                         {
                             Console.WriteLine($"Login Failed! Incorrect username or password for '{username}'.");
-                            // Later: Send a failure byte back to the client
+                            await stream.WriteAsync(new byte[] { 0 }, 0, 1); // Send Fail (0)
                         }
                     }
                 }
@@ -90,6 +90,11 @@ class Program
                         if (success)
                         {
                             Console.WriteLine($"Success! User '{username}' has been saved to the database.");
+                            await stream.WriteAsync(new byte[] { 1 }, 0, 1); // Send Success (1)
+                        }
+                        else
+                        {
+                            await stream.WriteAsync(new byte[] { 0 }, 0, 1); // Send Fail (0)
                         }
                     }
                 }

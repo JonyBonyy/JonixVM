@@ -39,24 +39,39 @@ public partial class SignupView : UserControl
             using TcpClient client = new TcpClient();
             await client.ConnectAsync("127.0.0.1", 5000);
             
-            // Format the credentials with a colon separator so the server can parse them
             string credentials = $"{username}:{password}";
             byte[] credentialsBytes = Encoding.UTF8.GetBytes(credentials);
-            
-            // Create a new byte array that is 1 byte larger to fit the Opcode at the beginning
             byte[] payload = new byte[credentialsBytes.Length + 1];
             
-            // The first byte (index 0) is our Opcode. 2 = Sign In / Register
             payload[0] = 2;
-            
-            // Copy the rest of the data into the array, immediately after the Opcode
             Array.Copy(credentialsBytes, 0, payload, 1, credentialsBytes.Length);
             
-            // Send to the server
             NetworkStream stream = client.GetStream();
             await stream.WriteAsync(payload, 0, payload.Length);
-            
-            Console.WriteLine("Binary Sign-In request sent to server!");
+            Console.WriteLine("Binary request sent to server! Waiting for response...");
+
+            // --- Wait for the server's response ---
+            byte[] responseBuffer = new byte[1];
+            int bytesRead = await stream.ReadAsync(responseBuffer, 0, responseBuffer.Length);
+
+            if (bytesRead > 0 && responseBuffer[0] == 1) // 1 means Success
+            {
+                Console.WriteLine("Server approved! Navigating to Home Page...");
+                
+                // Navigate to the HomePageView safely on the UI thread
+                Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+                {
+                    var window = TopLevel.GetTopLevel(this) as Window;
+                    if (window != null)
+                    {
+                        window.Content = new HomePageView();
+                    }
+                });
+            }
+            else // 0 means Fail
+            {
+                Console.WriteLine("Server rejected the request. Invalid credentials or username taken.");
+            }
         }
         catch (Exception ex)
         {

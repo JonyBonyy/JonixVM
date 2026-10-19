@@ -17,14 +17,13 @@
     </Design.DataContext>
 
     
-    <StackPanel HorizontalAlignment="Center" Margin="0,100,0,0" Spacing="50">
+    <StackPanel HorizontalAlignment="Center" Margin="0,200,0,0" Spacing="50">
         
         <TextBlock Text="JonixVM"
-                   Height="55" Width="200"
+                   Height="52" Width="200"
                    FontSize="50"
                    FontWeight="SemiLight"
-                   Foreground="#1a1a2e"
-                   TextAlignment="Center">
+                   Foreground="#1a1a2e">
             <TextBlock.Background>
                 <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
                     <GradientStop Offset="0" Color="#ffffff" />
