@@ -23,16 +23,22 @@ class Program
             return; // This completely stops the program
         }
 
-        // 2. Start the TCP Listener on port 5000
-        TcpListener listener = new TcpListener(IPAddress.Parse("127.0.0.1"), 5000);
+        // 2. Start the TCP Listener on port 5000 (IPAddress.Any allows connections from any IP)
+        TcpListener listener = new TcpListener(IPAddress.Any, 5000);
         listener.Start();
-        Console.WriteLine("Server is actively listening on port 5000...");
+        Console.WriteLine("Server is actively listening on port 5000 (Open to local network)...");
 
         // 3. Keep the server awake to accept incoming connections
         while (true)
         {
             TcpClient client = await listener.AcceptTcpClientAsync();
-            Console.WriteLine("An Avalonia client has connected to the server!");
+            
+            // Get the exact IP and Port of the client that just connected
+            if (client.Client.RemoteEndPoint != null)
+            {
+                string clientIpAndPort = client.Client.RemoteEndPoint.ToString();
+                Console.WriteLine($"[+] New client connected from IP & Port: {clientIpAndPort}");
+            }
             
             NetworkStream stream = client.GetStream();
             byte[] buffer = new byte[1024]; 
