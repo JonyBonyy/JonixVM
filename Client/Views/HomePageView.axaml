@@ -2,9 +2,157 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="300"
+             mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
              x:Class="Client.Views.HomePageView">
-    <StackPanel >
+    
+    <!-- This style prevents the button from changing color when pressed (Checked) -->
+    <UserControl.Styles>
+        <Style Selector="ToggleButton:checked /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#5A7D8E" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="ToggleButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#4B6B7A" />
+        </Style>
+    </UserControl.Styles>
+
+    <!-- Wrapped everything in a Panel so the toggle button can float above the rest of the screen -->
+    <Panel>
         
-    </StackPanel>
+        <!-- Changing DisplayMode to Inline means when the menu is closed, it disappears completely -->
+        <SplitView DisplayMode="Inline"
+                   OpenPaneLength="240"
+                   IsPaneOpen="{Binding #SidebarToggle.IsChecked}">
+                   
+            <!-- 1. Sidebar -->
+            <SplitView.Pane>
+                <!-- Added a top padding of 80 so the buttons don't overlap with the floating toggle button -->
+                <Border Padding="20,80,20,20">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                            <GradientStop Offset="0" Color="#5A7D8E" />
+                            <GradientStop Offset="1" Color="#2A4552" />
+                        </LinearGradientBrush>
+                    </Border.Background>
+
+                    <Grid RowDefinitions="Auto, *, Auto">
+                        
+                        <!-- Top Settings Button -->
+                        <Button Grid.Row="0"
+                                Content="⚙ Settings" 
+                                FontSize="16"
+                                FontWeight="SemiBold"
+                                HorizontalAlignment="Stretch" 
+                                HorizontalContentAlignment="Left"
+                                VerticalContentAlignment="Center"
+                                Height="45"
+                                CornerRadius="10"
+                                Foreground="White"
+                                Background="#20FFFFFF"
+                                Padding="15,0,0,0"/>
+                        
+                        <!-- Scrollable area for system buttons -->
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,30,0,0">
+                            <StackPanel Spacing="12">
+                                
+                                <!-- New VM Button -->
+                                <Button Content="+ New VM" 
+                                        FontSize="16"
+                                        FontWeight="Bold"
+                                        HorizontalAlignment="Stretch" 
+                                        HorizontalContentAlignment="Left"
+                                        VerticalContentAlignment="Center"
+                                        Height="45"
+                                        CornerRadius="10"
+                                        Foreground="White"
+                                        Background="#33FFFFFF"
+                                        Padding="15,0,0,0"/>
+                                
+                                <!-- Virtual Machines Button -->
+                                <Button Content="🖥 VMs" 
+                                        FontSize="16"
+                                        FontWeight="SemiBold"
+                                        HorizontalAlignment="Stretch"
+                                        HorizontalContentAlignment="Left"
+                                        VerticalContentAlignment="Center"
+                                        Height="45"
+                                        CornerRadius="10"
+                                        Foreground="White"
+                                        Background="#10FFFFFF"
+                                        Padding="15,0,0,0"/>
+                                        
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <!-- Bottom area: Theme toggle and Login -->
+                        <StackPanel Grid.Row="2" Spacing="12">
+                            
+                            <!-- Theme toggle button (Sun) -->
+                            <Button Content="☼ Theme" 
+                                    FontSize="16"
+                                    FontWeight="SemiBold"
+                                    HorizontalAlignment="Stretch" 
+                                    HorizontalContentAlignment="Left"
+                                    VerticalContentAlignment="Center"
+                                    Height="45"
+                                    CornerRadius="10"
+                                    Foreground="White"
+                                    Background="#10FFFFFF"
+                                    Padding="15,0,0,0"/>
+
+                            <!-- Prominent Login button -->
+                            <Button Content="Log In"
+                                    Click="LoginButtonClick"
+                                    FontSize="16"
+                                    FontWeight="Bold"
+                                    HorizontalAlignment="Stretch" 
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    Height="45"
+                                    CornerRadius="10"
+                                    Foreground="#2A4552"
+                                    Background="White"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </SplitView.Pane>
+
+            <!-- 2. Main Content -->
+            <SplitView.Content>
+                <Panel>
+                    <Panel.Background>
+                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                            <GradientStop Offset="0" Color="#D9F0F0" />
+                            <GradientStop Offset="0.5" Color="#EAF5F5" />
+                            <GradientStop Offset="1" Color="White" />
+                        </LinearGradientBrush>
+                    </Panel.Background>
+                    
+                    <TextBlock Text="JonixVM"
+                               FontSize="90"
+                               FontWeight="Heavy"
+                               Foreground="#2A4552"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                </Panel>
+            </SplitView.Content>
+            
+        </SplitView>
+
+        <!-- 3. Open/Close button that always floats on the top left -->
+        <ToggleButton x:Name="SidebarToggle"
+                      IsChecked="true"
+                      Content="☰" 
+                      FontSize="24"
+                      FontWeight="Bold"
+                      HorizontalAlignment="Left" 
+                      VerticalAlignment="Top"
+                      HorizontalContentAlignment="Center"
+                      VerticalContentAlignment="Center"
+                      Width="45" Height="45"
+                      CornerRadius="10"
+                      Foreground="White"
+                      Background="#5A7D8E"
+                      Margin="20,20,0,0"/>
+    </Panel>
 </UserControl>

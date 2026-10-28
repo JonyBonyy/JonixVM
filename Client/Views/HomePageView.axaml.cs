@@ -9,4 +9,14 @@ public partial class HomePageView : UserControl
     {
         InitializeComponent();
     }
+    
+    private void LoginButtonClick(object? sender, RoutedEventArgs e)
+    {
+        var window = TopLevel.GetTopLevel(this) as Window;
+        if (window != null)
+        {
+            // Instantly swap the view back to the saved start screen
+            window.Content = MainWindow.StartScreenContent;
+        }
+    }
 }
