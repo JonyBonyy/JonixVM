@@ -44,10 +44,49 @@
                                 Foreground="White"
                                 Background="#20FFFFFF"
                                 Padding="15,0,0,0" />
-                                
-                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,30,0,0">
+
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,25,0,0">
                             <StackPanel Spacing="12">
-                                <Button Content="+ New VM"
+
+                                <!-- Cloud Section -->
+                                <TextBlock Text="CLOUD"
+                                           FontSize="11"
+                                           FontWeight="Bold"
+                                           Foreground="#AAFFFFFF"
+                                           Margin="6,0,0,0" />
+
+                                <Button Content="+ New Cloud VM"
+                                        FontSize="16"
+                                        FontWeight="Bold"
+                                        HorizontalAlignment="Stretch"
+                                        HorizontalContentAlignment="Left"
+                                        VerticalContentAlignment="Center"
+                                        Height="45"
+                                        CornerRadius="10"
+                                        Foreground="White"
+                                        Background="#33FFFFFF"
+                                        Padding="15,0,0,0" />
+
+                                <Button Content="🖥 Cloud VMs"
+                                        FontSize="16"
+                                        FontWeight="SemiBold"
+                                        HorizontalAlignment="Stretch"
+                                        HorizontalContentAlignment="Left"
+                                        VerticalContentAlignment="Center"
+                                        Height="45"
+                                        CornerRadius="10"
+                                        Foreground="White"
+                                        Background="#20FFFFFF"
+                                        Padding="15,0,0,0" />
+
+                                <!-- Local Section -->
+                                <TextBlock Text="LOCAL"
+                                           FontSize="11"
+                                           FontWeight="Bold"
+                                           Foreground="#AAFFFFFF"
+                                           Margin="6,18,0,0" />
+
+                                <Button Content="+ New Local VM"
                                         Click="NewVmButton_Click"
                                         FontSize="16"
                                         FontWeight="Bold"
@@ -60,7 +99,7 @@
                                         Background="#33FFFFFF"
                                         Padding="15,0,0,0" />
 
-                                <Button Content="🖥 VMs"
+                                <Button Content="🖥 Local VMs"
                                         FontSize="16"
                                         FontWeight="SemiBold"
                                         HorizontalAlignment="Stretch"
@@ -69,7 +108,7 @@
                                         Height="45"
                                         CornerRadius="10"
                                         Foreground="White"
-                                        Background="#33FFFFFF"
+                                        Background="#20FFFFFF"
                                         Padding="15,0,0,0" />
 
                             </StackPanel>
@@ -86,6 +125,18 @@
                                     CornerRadius="10"
                                     Foreground="White"
                                     Background="#10FFFFFF"
+                                    Padding="15,0,0,0" />
+
+                            <Button Content="👤 Users"
+                                    FontSize="16"
+                                    FontWeight="SemiBold"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Left"
+                                    VerticalContentAlignment="Center"
+                                    Height="45"
+                                    CornerRadius="10"
+                                    Foreground="White"
+                                    Background="#20FFFFFF"
                                     Padding="15,0,0,0" />
 
                             <Button Content="Log In"
