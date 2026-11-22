@@ -16,7 +16,7 @@ public class DatabaseManager
         {
             await using var conn = new NpgsqlConnection(_connectionString);
             await conn.OpenAsync();
-            Console.WriteLine("Successfully connected to the PostgreSQL database!");
+            Console.WriteLine("Successfully connected to the PostgreSQL database");
             return true;
         }
         catch (Exception ex)
