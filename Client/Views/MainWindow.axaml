@@ -19,7 +19,8 @@
     <Panel>
         <Panel.Background>
             <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,10%">
-                <GradientStop Offset="0" Color="#a5d6d6" />
+                <GradientStop Offset="0" Color="#D9F0F0" />
+                <GradientStop Offset="0.5" Color="#EAF5F5" />
                 <GradientStop Offset="1" Color="White" />
             </LinearGradientBrush>
         </Panel.Background>
@@ -28,15 +29,11 @@
                 
             <TextBlock Text="JonixVM"
                        FontSize="75"
-                       FontWeight="Bold"
+                       FontWeight="SemiBold"
                        HorizontalAlignment="Center"
-                       VerticalAlignment="Center">
-                <TextBlock.Foreground>
-                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                        <GradientStop Offset="0" Color="#4a5d6e" />
-                        <GradientStop Offset="1" Color="#4aa" />
-                    </LinearGradientBrush>
-                </TextBlock.Foreground>
+                       VerticalAlignment="Center"
+                       Foreground="#2A4552">
+                       
             </TextBlock>
             
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="15">
@@ -44,7 +41,7 @@
                 <Button Content="Log In"
                         Click="NavigateToLogin_Click"
                         Width="300" Height="50"
-                        Background="#374752"
+                        Background="#5A7D8E"
                         Foreground="White"
                         FontSize="16"
                         FontWeight="Bold"
@@ -55,7 +52,7 @@
                 <Button Content="Sign up" 
                         Click="NavigateToSignup_Click"
                         Width="300" Height="50"
-                        Background="#374752"
+                        Background="#5A7D8E"
                         Foreground="White"
                         FontSize="16"
                         FontWeight="Bold"
