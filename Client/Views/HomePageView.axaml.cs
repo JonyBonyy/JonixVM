@@ -247,7 +247,8 @@ public partial class HomePageView : UserControl
             FontWeight = FontWeight.Light,
             Foreground = SolidColorBrush.Parse("#5A7D8E"),
             HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(0, 0, 0, 24)
         };
         Grid.SetRow(plus, 1);
 
