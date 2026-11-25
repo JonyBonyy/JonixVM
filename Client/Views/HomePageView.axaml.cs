@@ -1,8 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
+using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Client.Models;
 
@@ -15,6 +20,11 @@ public partial class HomePageView : UserControl
     private int _maxCores;
     private long _maxRamMb;
     private long _maxDiskGb;
+
+    private bool _showingCloud = true;
+    private VmConfig? _editingVm;
+    private readonly List<VmConfig> _cloudVms = new();
+    private readonly List<VmConfig> _localVms = new();
 
     public HomePageView()
     {
@@ -69,17 +79,252 @@ public partial class HomePageView : UserControl
             DiskValueText.Text = $"{(int)DiskSlider.Value} GB / {_maxDiskGb} GB free";
     }
 
+    // --- Sidebar Navigation & VM Grid ---
+
+    private void CloudVmsButton_Click(object? sender, RoutedEventArgs e)
+    {
+        ShowVmGrid(isCloud: true);
+    }
+
+    private void LocalVmsButton_Click(object? sender, RoutedEventArgs e)
+    {
+        ShowVmGrid(isCloud: false);
+    }
+
+    private void CancelCreateForm_Click(object? sender, RoutedEventArgs e)
+    {
+        _editingVm = null;
+        ShowVmGrid(_showingCloud);
+    }
+
+    private void ShowVmGrid(bool isCloud)
+    {
+        _showingCloud = isCloud;
+        _editingVm = null;
+
+        WelcomeText.IsVisible = false;
+        CreateVmForm.IsVisible = false;
+        CreateCloudVmForm.IsVisible = false;
+        VmGridView.IsVisible = true;
+
+        VmGridTitle.Text = isCloud ? "Cloud VMs" : "Local VMs";
+        RenderVmCards();
+    }
+
+    private void RenderVmCards()
+    {
+        VmCardsPanel.Children.Clear();
+
+        var vms = _showingCloud ? _cloudVms : _localVms;
+
+        foreach (var vm in vms)
+        {
+            VmCardsPanel.Children.Add(BuildVmCard(vm));
+        }
+
+        // Always add the "Create VM" (+) square at the end (or first if list is empty)
+        VmCardsPanel.Children.Add(BuildCreateVmCard());
+    }
+
+    private Control BuildVmCard(VmConfig vm)
+    {
+        string osDisplay = vm.IsCloud
+            ? vm.IsoOrImage
+            : Path.GetFileName(vm.IsoOrImage);
+
+        string details = vm.IsCloud
+            ? $"OS: {osDisplay}\nCloud Hosted"
+            : $"OS: {(string.IsNullOrWhiteSpace(osDisplay) ? "No ISO" : osDisplay)}\n{vm.Cores} Cores • {vm.RamMb} MB\n{vm.DiskGb} GB Disk";
+
+        var cardContent = new Grid
+        {
+            RowDefinitions = new RowDefinitions("Auto, *, Auto")
+        };
+
+        var titleText = new TextBlock
+        {
+            Text = string.IsNullOrWhiteSpace(vm.Name) ? "Unnamed VM" : vm.Name,
+            FontSize = 18,
+            FontWeight = FontWeight.Bold,
+            Foreground = SolidColorBrush.Parse("#2A4552"),
+            TextTrimming = TextTrimming.CharacterEllipsis,
+            Margin = new Thickness(0, 4, 34, 8) // leave room for the top-right gear icon
+        };
+        Grid.SetRow(titleText, 0);
+
+        var detailsText = new TextBlock
+        {
+            Text = details,
+            FontSize = 13,
+            Foreground = SolidColorBrush.Parse("#5A7D8E"),
+            TextWrapping = TextWrapping.Wrap
+        };
+        Grid.SetRow(detailsText, 1);
+
+        var launchHint = new TextBlock
+        {
+            Text = "▶ Start VM",
+            FontSize = 13,
+            FontWeight = FontWeight.SemiBold,
+            Foreground = SolidColorBrush.Parse("#5A7D8E"),
+            HorizontalAlignment = HorizontalAlignment.Left
+        };
+        Grid.SetRow(launchHint, 2);
+
+        cardContent.Children.Add(titleText);
+        cardContent.Children.Add(detailsText);
+        cardContent.Children.Add(launchHint);
+
+        // Main clickable VM card button
+        var mainButton = new Button
+        {
+            Width = 210,
+            Height = 210,
+            Padding = new Thickness(18),
+            HorizontalContentAlignment = HorizontalAlignment.Stretch,
+            VerticalContentAlignment = VerticalAlignment.Stretch,
+            Cursor = new Cursor(StandardCursorType.Hand),
+            Content = cardContent
+        };
+        mainButton.Classes.Add("vm-card");
+        mainButton.Click += (_, _) =>
+        {
+            // Launch or open VM console here
+        };
+
+        // Top-right gear settings button
+        var gearButton = new Button
+        {
+            Content = "⚙",
+            Width = 32,
+            Height = 32,
+            Padding = new  Thickness(0),
+            FontSize = 16,
+            Foreground = SolidColorBrush.Parse("#2A4552"),
+            HorizontalAlignment = HorizontalAlignment.Right,
+            VerticalAlignment = VerticalAlignment.Top,
+            HorizontalContentAlignment = HorizontalAlignment.Center,
+            VerticalContentAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(0, 12, 12, 0),
+            Cursor = new Cursor(StandardCursorType.Hand)
+        };
+        gearButton.Classes.Add("card-gear");
+        gearButton.Click += (_, _) => OpenEditVmForm(vm);
+
+        var wrapper = new Panel
+        {
+            Width = 210,
+            Height = 210,
+            Margin = new Thickness(0, 0, 20, 20)
+        };
+        wrapper.Children.Add(mainButton);
+        wrapper.Children.Add(gearButton);
+
+        return wrapper;
+    }
+
+    private Control BuildCreateVmCard()
+    {
+        var grid = new Grid
+        {
+            RowDefinitions = new RowDefinitions("Auto, *")
+        };
+
+        var title = new TextBlock
+        {
+            Text = "Create VM",
+            FontSize = 18,
+            FontWeight = FontWeight.Bold,
+            Foreground = SolidColorBrush.Parse("#2A4552"),
+            HorizontalAlignment = HorizontalAlignment.Center
+        };
+        Grid.SetRow(title, 0);
+
+        var plus = new TextBlock
+        {
+            Text = "+",
+            FontSize = 72,
+            FontWeight = FontWeight.Light,
+            Foreground = SolidColorBrush.Parse("#5A7D8E"),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        Grid.SetRow(plus, 1);
+
+        grid.Children.Add(title);
+        grid.Children.Add(plus);
+
+        var button = new Button
+        {
+            Width = 210,
+            Height = 210,
+            Margin = new Thickness(0, 0, 20, 20),
+            Padding = new Thickness(20),
+            HorizontalContentAlignment = HorizontalAlignment.Stretch,
+            VerticalContentAlignment = VerticalAlignment.Stretch,
+            Cursor = new Cursor(StandardCursorType.Hand),
+            Content = grid
+        };
+        button.Classes.Add("vm-card");
+
+        button.Click += (_, _) =>
+        {
+            _editingVm = null;
+            if (_showingCloud)
+                OpenCloudCreateForm();
+            else
+                OpenLocalCreateForm();
+        };
+
+        return button;
+    }
+
+    private void OpenEditVmForm(VmConfig vm)
+    {
+        _editingVm = vm;
+
+        if (vm.IsCloud)
+        {
+            OpenCloudCreateForm(vm);
+        }
+        else
+        {
+            OpenLocalCreateForm(vm);
+        }
+    }
+
     // --- Cloud VM Form ---
 
-    private void NewCloudVmButton_Click(object? sender, RoutedEventArgs e)
+    private void OpenCloudCreateForm(VmConfig? existing = null)
     {
-        WelcomeText.IsVisible = false;
+        VmGridView.IsVisible = false;
         CreateVmForm.IsVisible = false;
         CreateCloudVmForm.IsVisible = true;
 
-        CloudVmNameInput.Text = string.Empty;
+        bool isEditing = existing != null;
+        CloudFormTitle.Text = isEditing ? "Edit Cloud VM" : "Create New Cloud VM";
+        CreateCloudVmButton.Content = isEditing ? "Save Changes" : "Create Cloud VM";
+
+        CloudVmNameInput.Text = existing?.Name ?? string.Empty;
         CloudVmNameError.IsVisible = false;
-        CreateCloudVmButton.IsEnabled = false;
+        CreateCloudVmButton.IsEnabled = !string.IsNullOrWhiteSpace(CloudVmNameInput.Text);
+
+        if (existing != null)
+        {
+            for (int i = 0; i < CloudOsCombo.Items.Count; i++)
+            {
+                if (CloudOsCombo.Items[i] is ComboBoxItem item &&
+                    string.Equals(item.Content?.ToString(), existing.IsoOrImage, StringComparison.OrdinalIgnoreCase))
+                {
+                    CloudOsCombo.SelectedIndex = i;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            CloudOsCombo.SelectedIndex = 0;
+        }
     }
 
     private void CloudVmNameInput_TextChanged(object? sender, TextChangedEventArgs e)
@@ -98,28 +343,85 @@ public partial class HomePageView : UserControl
             return;
         }
 
-        string selectedOs = (CloudOsCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Ubuntu 24.04 LTS";
+        string selectedOs = (CloudOsCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Ubuntu";
 
-        var cloudConfig = new VmConfig
+        if (_editingVm != null)
         {
-            Name = name,
-            IsoOrImage = selectedOs,
-            IsCloud = true
-        };
+            _editingVm.Name = name;
+            _editingVm.IsoOrImage = selectedOs;
+        }
+        else
+        {
+            _cloudVms.Add(new VmConfig
+            {
+                Name = name,
+                IsoOrImage = selectedOs,
+                IsCloud = true
+            });
+        }
 
-        // TODO: Send cloudConfig to Server via CloudVmClient.CreateVmAsync(cloudConfig)
+        ShowVmGrid(isCloud: true);
     }
 
     // --- Local VM Wizard ---
 
-    private void NewVmButton_Click(object? sender, RoutedEventArgs e)
+    private void OpenLocalCreateForm(VmConfig? existing = null)
     {
-        WelcomeText.IsVisible = false;
+        VmGridView.IsVisible = false;
         CreateCloudVmForm.IsVisible = false;
         CreateVmForm.IsVisible = true;
 
+        bool isEditing = existing != null;
+        LocalFormTitle.Text = isEditing ? "Edit Local VM" : "Create New Local VM";
+
+        VmNameInput.Text = existing?.Name ?? string.Empty;
+        IsoPathInput.Text = existing?.IsoOrImage ?? string.Empty;
+        LocalStep1Error.IsVisible = false;
+
+        if (existing != null)
+        {
+            RamSlider.Value = Math.Clamp(existing.RamMb, RamSlider.Minimum, RamSlider.Maximum);
+            CoresSlider.Value = Math.Clamp(existing.Cores, CoresSlider.Minimum, CoresSlider.Maximum);
+            DiskSlider.Value = Math.Clamp(existing.DiskGb, DiskSlider.Minimum, DiskSlider.Maximum);
+            KvmCheckBox.IsChecked = existing.EnableHardwareAccel;
+
+            for (int i = 0; i < NetworkModeCombo.Items.Count; i++)
+            {
+                if (NetworkModeCombo.Items[i] is ComboBoxItem item &&
+                    string.Equals(item.Content?.ToString(), existing.NetworkMode, StringComparison.OrdinalIgnoreCase))
+                {
+                    NetworkModeCombo.SelectedIndex = i;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            RamSlider.Value = Math.Min(2048, _maxRamMb);
+            CoresSlider.Value = Math.Min(2, _maxCores);
+            DiskSlider.Value = Math.Min(20, _maxDiskGb);
+            NetworkModeCombo.SelectedIndex = 0;
+            KvmCheckBox.IsChecked = true;
+        }
+
         _currentStep = 1;
         UpdateStepUI();
+    }
+
+    private void LocalStep1_Changed(object? sender, TextChangedEventArgs e)
+    {
+        if (_currentStep == 1)
+        {
+            bool valid = IsLocalStep1Valid();
+            NextStepButton.IsEnabled = valid;
+            LocalStep1Error.IsVisible = !valid;
+        }
+    }
+
+    private bool IsLocalStep1Valid()
+    {
+        return !string.IsNullOrWhiteSpace(VmNameInput.Text) &&
+               !string.IsNullOrWhiteSpace(IsoPathInput.Text);
     }
 
     private async void BrowseIsoButton_Click(object? sender, RoutedEventArgs e)
@@ -162,6 +464,12 @@ public partial class HomePageView : UserControl
 
     private void NextStepButton_Click(object? sender, RoutedEventArgs e)
     {
+        if (_currentStep == 1 && !IsLocalStep1Valid())
+        {
+            LocalStep1Error.IsVisible = true;
+            return;
+        }
+
         if (_currentStep < TotalSteps)
         {
             _currentStep++;
@@ -169,19 +477,40 @@ public partial class HomePageView : UserControl
         }
         else
         {
-            var localConfig = new VmConfig
-            {
-                Name = VmNameInput.Text?.Trim() ?? "",
-                IsoOrImage = IsoPathInput.Text ?? "",
-                RamMb = (int)RamSlider.Value,
-                Cores = (int)CoresSlider.Value,
-                DiskGb = (int)DiskSlider.Value,
-                NetworkMode = (NetworkModeCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "NAT",
-                EnableHardwareAccel = KvmCheckBox.IsChecked ?? true,
-                IsCloud = false
-            };
+            string name = VmNameInput.Text?.Trim() ?? "";
+            string iso = IsoPathInput.Text ?? "";
+            int ramMb = (int)RamSlider.Value;
+            int cores = (int)CoresSlider.Value;
+            int diskGb = (int)DiskSlider.Value;
+            string network = (NetworkModeCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "NAT";
+            bool useKvm = KvmCheckBox.IsChecked ?? true;
 
-            // TODO: Pass localConfig to LocalVmManager.CreateVmAsync(localConfig)
+            if (_editingVm != null)
+            {
+                _editingVm.Name = name;
+                _editingVm.IsoOrImage = iso;
+                _editingVm.RamMb = ramMb;
+                _editingVm.Cores = cores;
+                _editingVm.DiskGb = diskGb;
+                _editingVm.NetworkMode = network;
+                _editingVm.EnableHardwareAccel = useKvm;
+            }
+            else
+            {
+                _localVms.Add(new VmConfig
+                {
+                    Name = name,
+                    IsoOrImage = iso,
+                    RamMb = ramMb,
+                    Cores = cores,
+                    DiskGb = diskGb,
+                    NetworkMode = network,
+                    EnableHardwareAccel = useKvm,
+                    IsCloud = false
+                });
+            }
+
+            ShowVmGrid(isCloud: false);
         }
     }
 
@@ -199,21 +528,25 @@ public partial class HomePageView : UserControl
         {
             StepSubtitle.Text = "Step 1: Basic Information";
             NextStepButton.Content = "→";
+            NextStepButton.IsEnabled = IsLocalStep1Valid();
         }
         else if (_currentStep == 2)
         {
             StepSubtitle.Text = "Step 2: Hardware Allocation";
             NextStepButton.Content = "→";
+            NextStepButton.IsEnabled = true;
         }
         else if (_currentStep == 3)
         {
             StepSubtitle.Text = "Step 3: Storage & Network";
             NextStepButton.Content = "→";
+            NextStepButton.IsEnabled = true;
         }
         else if (_currentStep == 4)
         {
-            StepSubtitle.Text = "Step 4: Confirm & Create";
-            NextStepButton.Content = "Confirm ✓";
+            StepSubtitle.Text = _editingVm != null ? "Step 4: Confirm & Save" : "Step 4: Confirm & Create";
+            NextStepButton.Content = _editingVm != null ? "Save ✓" : "Confirm ✓";
+            NextStepButton.IsEnabled = true;
 
             SummaryName.Text = string.IsNullOrWhiteSpace(VmNameInput.Text) ? "Not set" : VmNameInput.Text;
             SummaryIso.Text = string.IsNullOrWhiteSpace(IsoPathInput.Text) ? "Not set" : IsoPathInput.Text;
