@@ -46,6 +46,7 @@ public partial class SignupView : UserControl
     {
         try
         {
+            //instead of writing client.Close(); at the end I used using so it will close it by itself whan the task is finished.
             using TcpClient client = new TcpClient();
             await client.ConnectAsync("127.0.0.1", 5000);
             

@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using Client.Models;
 
 namespace Client.Views;
 
@@ -50,7 +51,7 @@ public partial class HomePageView : UserControl
 
         UpdateHardwareLabels();
     }
-    
+
     private void HardwareSlider_ValueChanged(object? sender, RangeBaseValueChangedEventArgs e)
     {
         UpdateHardwareLabels();
@@ -68,9 +69,53 @@ public partial class HomePageView : UserControl
             DiskValueText.Text = $"{(int)DiskSlider.Value} GB / {_maxDiskGb} GB free";
     }
 
+    // --- Cloud VM Form ---
+
+    private void NewCloudVmButton_Click(object? sender, RoutedEventArgs e)
+    {
+        WelcomeText.IsVisible = false;
+        CreateVmForm.IsVisible = false;
+        CreateCloudVmForm.IsVisible = true;
+
+        CloudVmNameInput.Text = string.Empty;
+        CloudVmNameError.IsVisible = false;
+        CreateCloudVmButton.IsEnabled = false;
+    }
+
+    private void CloudVmNameInput_TextChanged(object? sender, TextChangedEventArgs e)
+    {
+        bool isEmpty = string.IsNullOrWhiteSpace(CloudVmNameInput.Text);
+        CloudVmNameError.IsVisible = isEmpty;
+        CreateCloudVmButton.IsEnabled = !isEmpty;
+    }
+
+    private void CreateCloudVmButton_Click(object? sender, RoutedEventArgs e)
+    {
+        string name = CloudVmNameInput.Text?.Trim() ?? "";
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            CloudVmNameError.IsVisible = true;
+            return;
+        }
+
+        string selectedOs = (CloudOsCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Ubuntu 24.04 LTS";
+
+        var cloudConfig = new VmConfig
+        {
+            Name = name,
+            IsoOrImage = selectedOs,
+            IsCloud = true
+        };
+
+        // TODO: Send cloudConfig to Server via CloudVmClient.CreateVmAsync(cloudConfig)
+    }
+
+    // --- Local VM Wizard ---
+
     private void NewVmButton_Click(object? sender, RoutedEventArgs e)
     {
         WelcomeText.IsVisible = false;
+        CreateCloudVmForm.IsVisible = false;
         CreateVmForm.IsVisible = true;
 
         _currentStep = 1;
@@ -124,14 +169,19 @@ public partial class HomePageView : UserControl
         }
         else
         {
-            // Step 4 confirmed: pass these to PostgreSQL / QEMU
-            string name = VmNameInput.Text ?? "";
-            string iso = IsoPathInput.Text ?? "";
-            int ramMb = (int)RamSlider.Value;
-            int cores = (int)CoresSlider.Value;
-            int diskGb = (int)DiskSlider.Value;
-            string network = (NetworkModeCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "NAT";
-            bool useKvm = KvmCheckBox.IsChecked ?? true;
+            var localConfig = new VmConfig
+            {
+                Name = VmNameInput.Text?.Trim() ?? "",
+                IsoOrImage = IsoPathInput.Text ?? "",
+                RamMb = (int)RamSlider.Value,
+                Cores = (int)CoresSlider.Value,
+                DiskGb = (int)DiskSlider.Value,
+                NetworkMode = (NetworkModeCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "NAT",
+                EnableHardwareAccel = KvmCheckBox.IsChecked ?? true,
+                IsCloud = false
+            };
+
+            // TODO: Pass localConfig to LocalVmManager.CreateVmAsync(localConfig)
         }
     }
 

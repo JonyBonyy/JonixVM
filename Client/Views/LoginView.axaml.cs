@@ -37,6 +37,7 @@ public partial class LoginView : UserControl
 
         try
         {
+            //instead of writing client.Close(); at the end I used using so it will close it by itself whan the task is finished.
             using TcpClient client = new TcpClient();
             await client.ConnectAsync("127.0.0.1", 5000);
             
@@ -44,7 +45,7 @@ public partial class LoginView : UserControl
             byte[] credentialsBytes = Encoding.UTF8.GetBytes(credentials);
             byte[] payload = new byte[credentialsBytes.Length + 1];
             
-            payload[0] = 1; // Change to 2 for the SignupView
+            payload[0] = 1;
             Array.Copy(credentialsBytes, 0, payload, 1, credentialsBytes.Length);
             
             NetworkStream stream = client.GetStream();
